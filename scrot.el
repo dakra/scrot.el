@@ -26,6 +26,8 @@
 
 ;;; Code:
 
+(require 'request)
+
 (defgroup scrot nil
   "Screenshot utility using scrot"
   :prefix "scrot-"
@@ -51,6 +53,26 @@
       '(("laptop" "~/Screenshots" "%s")
         ("kraus.my" "ssh:kraus.my:screenshots" "https://daniel.kraus.my/screenshots/%s")))
 
+;; From https://github.com/ecraven/imgbb.el
+;;;###autoload
+(defun scrot-upload (filename)
+  "Upload FILENAME to imgbb.com, show the image url and put it into the kill ring."
+  (interactive "fImage file: ")
+  (request "https://imgbb.com/json"
+           :params '((type . "file")
+                     (action . "upload"))
+           :files `(("source" . (,(file-name-nondirectory filename) :file ,filename)))
+           :parser 'json-read
+           :error (cl-function
+                   (lambda (&rest args &key _error-thrown &allow-other-keys)
+                     (message "Error uploading image.")))
+           :success (cl-function
+                     (lambda (&key data &allow-other-keys)
+                       (let ((url (assoc-default 'url (assoc-default 'image (assoc-default 'image data)))))
+                         (message "Image uploaded to %s" url)
+                         (browse-url url)
+                         (kill-new url))))))
+
 ;;;###autoload
 (defun scrot (name)
   "Take screenshot with filename NAME."
@@ -58,8 +80,12 @@
   (let* ((imagename (if (string-empty-p name) (projectile-project-name) name))
          (filename (format "%s%s.%s" (file-name-as-directory (expand-file-name scrot-local-path))
                            (shell-quote-argument imagename) scrot-file-ext)))
-    (message filename)
-    (start-process "scrot" nil scrot-command scrot-args filename)))
+    (make-process
+     :name "scrot"
+     :command (list scrot-command scrot-args filename)
+     :sentinel (lambda (p _e)
+                 (when (= 0 (process-exit-status p))
+                   (scrot-upload filename))))))
 
 (provide 'scrot)
 ;;; scrot.el ends here
