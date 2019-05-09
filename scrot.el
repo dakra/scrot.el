@@ -73,13 +73,22 @@
                          (browse-url url)
                          (kill-new url))))))
 
+(defun scrot-default-filenames ()
+  "Return list of filename suggestions for new screenshots."
+  (let ((project-name (file-name-nondirectory (directory-file-name (cdr (project-current))))))
+    (list
+     (concat project-name (format-time-string "-%Y-%m-%d"))
+     (concat project-name (format-time-string "-%Y-%m-%d--%H-%M-%S"))
+     (format-time-string "%Y-%m-%d-")
+     (concat project-name "-"))))
+
 ;;;###autoload
 (defun scrot (name)
   "Take screenshot with filename NAME."
-  (interactive "sImage name: ")
-  (let* ((imagename (if (string-empty-p name) (projectile-project-name) name))
-         (filename (format "%s%s.%s" (file-name-as-directory (expand-file-name scrot-local-path))
-                           (shell-quote-argument imagename) scrot-file-ext)))
+  (interactive
+   (list (read-string "Image name: " (car (scrot-default-filenames)) nil (cdr (scrot-default-filenames)))))
+  (let* ((filename (format "%s%s.%s" (file-name-as-directory (expand-file-name scrot-local-path))
+                           (shell-quote-argument name) scrot-file-ext)))
     (make-process
      :name "scrot"
      :command (list scrot-command scrot-args filename)
