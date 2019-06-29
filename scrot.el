@@ -1,6 +1,6 @@
 ;;; scrot.el --- Take screenshots with scrot         -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2018  Daniel Kraus
+;; Copyright (C) 2018-2019  Daniel Kraus
 
 ;; Author: Daniel Kraus <daniel@kraus.my>
 ;; Keywords: tools, multimedia, convenience
@@ -20,8 +20,8 @@
 
 ;;; Commentary:
 
-;; Take screenshots with scrot,
-;; upload them (with tramp) to a server and copy url to kill-ring
+;; Take screenshots with scrot (or tool specified in `scrot-command'),
+;; upload them to imgbb and copy the url to the kill-ring
 
 
 ;;; Code:
