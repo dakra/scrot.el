@@ -89,14 +89,19 @@
   "Take screenshot with filename NAME."
   (interactive
    (list (read-string "Image name: " (car (scrot-default-filenames)) nil (cdr (scrot-default-filenames)))))
-  (let* ((filename (format "%s%s.%s" (file-name-as-directory (expand-file-name scrot-local-path))
-                           (shell-quote-argument name) scrot-file-ext)))
+  (let ((use-org-format current-prefix-arg)
+        (buf (current-buffer))
+        (filename (format "%s%s.%s" (file-name-as-directory (expand-file-name scrot-local-path))
+                          (shell-quote-argument name) scrot-file-ext)))
     (make-process
      :name "scrot"
      :command (list scrot-command scrot-args filename)
      :sentinel (lambda (p _e)
                  (when (= 0 (process-exit-status p))
-                   (scrot-upload filename))))))
+                   (if use-org-format
+                       (with-current-buffer buf
+                         (insert (concat "[[" filename "]]")))
+                     (scrot-upload filename)))))))
 
 (provide 'scrot)
 ;;; scrot.el ends here
