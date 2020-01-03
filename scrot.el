@@ -1,6 +1,6 @@
 ;;; scrot.el --- Take screenshots with scrot         -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2018-2019  Daniel Kraus
+;; Copyright (C) 2018-2020  Daniel Kraus
 
 ;; Author: Daniel Kraus <daniel@kraus.my>
 ;; Keywords: tools, multimedia, convenience
@@ -49,9 +49,6 @@
   "Path where the screenshots should be stored locally."
   :type 'directory)
 
-(setq scrot-directories
-      '(("laptop" "~/Screenshots" "%s")
-        ("kraus.my" "ssh:kraus.my:screenshots" "https://daniel.kraus.my/screenshots/%s")))
 
 ;; From https://github.com/ecraven/imgbb.el
 ;;;###autoload
@@ -59,19 +56,19 @@
   "Upload FILENAME to imgbb.com, show the image url and put it into the kill ring."
   (interactive "fImage file: ")
   (request "https://imgbb.com/json"
-           :params '((type . "file")
-                     (action . "upload"))
-           :files `(("source" . (,(file-name-nondirectory filename) :file ,filename)))
-           :parser 'json-read
-           :error (cl-function
-                   (lambda (&rest args &key _error-thrown &allow-other-keys)
-                     (message "Error uploading image.")))
-           :success (cl-function
-                     (lambda (&key data &allow-other-keys)
-                       (let ((url (assoc-default 'url (assoc-default 'image (assoc-default 'image data)))))
-                         (message "Image uploaded to %s" url)
-                         (browse-url url)
-                         (kill-new url))))))
+    :params '((type . "file")
+              (action . "upload"))
+    :files `(("source" . (,(file-name-nondirectory filename) :file ,filename)))
+    :parser 'json-read
+    :error (cl-function
+            (lambda (&rest args &key _error-thrown &allow-other-keys)
+              (message "Error uploading image.")))
+    :success (cl-function
+              (lambda (&key data &allow-other-keys)
+                (let ((url (assoc-default 'url (assoc-default 'image (assoc-default 'image data)))))
+                  (message "Image uploaded to %s" url)
+                  (browse-url url)
+                  (kill-new url))))))
 
 (defun scrot-default-filenames ()
   "Return list of filename suggestions for new screenshots."
