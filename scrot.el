@@ -1,6 +1,6 @@
 ;;; scrot.el --- Take screenshots with scrot         -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2018-2021  Daniel Kraus
+;; Copyright (C) 2018-2023  Daniel Kraus
 
 ;; Author: Daniel Kraus <daniel@kraus.my>
 ;; Keywords: tools, multimedia, convenience
