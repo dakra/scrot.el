@@ -50,6 +50,10 @@
   "Path where the screenshots should be stored locally."
   :type 'directory)
 
+(defcustom scrot-upload-to-imdb t
+  "if non-nil, upload screenshots to imdb automatically."
+  :type 'bool)
+
 
 ;; From https://github.com/ecraven/imgbb.el
 ;;;###autoload
@@ -99,7 +103,8 @@
                    (if use-org-format
                        (with-current-buffer buf
                          (insert (concat "[[" filename "]]")))
-                     (scrot-upload filename)))))))
+                     (when scrot-upload-to-imdb
+                       (scrot-upload filename))))))))
 
 (provide 'scrot)
 ;;; scrot.el ends here
