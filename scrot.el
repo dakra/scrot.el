@@ -78,7 +78,7 @@
 (defun scrot-default-filenames ()
   "Return list of filename suggestions for new screenshots."
   (let ((project-name (if (project-current)
-                          (file-name-nondirectory (directory-file-name (cdr (project-current))))
+                          (file-name-nondirectory (directory-file-name (project-root (project-current))))
                         (buffer-name))))
     (list
      (concat project-name (format-time-string "-%Y-%m-%d"))
