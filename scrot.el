@@ -27,10 +27,11 @@
 
 ;;; Code:
 
+(require 'project)
 (require 'request)
 
 (defgroup scrot nil
-  "Screenshot utility using scrot"
+  "Screenshot utility using `scrot'."
   :prefix "scrot-"
   :group 'tools)
 
@@ -50,6 +51,12 @@
   "Path where the screenshots should be stored locally."
   :type 'directory)
 
+(defcustom scrot-upload-func #'scrot-upload
+  "Function that's called after `scrot-command' finished.
+The function is called with one argument, FILENAME.
+
+Don't call any function when nil."
+  :type 'function)
 
 ;; From https://github.com/ecraven/imgbb.el
 ;;;###autoload
@@ -99,7 +106,8 @@
                    (if use-org-format
                        (with-current-buffer buf
                          (insert (concat "[[" filename "]]")))
-                     (scrot-upload filename)))))))
+                     (when (fboundp scrot-upload-func)
+                       (apply scrot-upload-func (list filename)))))))))
 
 (provide 'scrot)
 ;;; scrot.el ends here
